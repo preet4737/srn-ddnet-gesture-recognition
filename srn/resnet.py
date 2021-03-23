@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import math
 import torch.utils.model_zoo as model_zoo
 
-from coord_conv import AddCoordinates, CoordConv, CoordConvTranspose, CoordConvNet, AddHeatmap,HeatmapConv
+from .coord_conv import AddCoordinates, CoordConv, CoordConvTranspose, CoordConvNet, AddHeatmap,HeatmapConv
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152']

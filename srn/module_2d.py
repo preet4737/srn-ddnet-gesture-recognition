@@ -5,7 +5,7 @@ import torch.utils.data
 import numpy as np
 
 
-from resnet import Bottleneck,BasicBlock
+from .resnet import Bottleneck,BasicBlock
 
 
 """

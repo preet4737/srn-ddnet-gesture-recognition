@@ -4,8 +4,10 @@ sys.path.append('..')
 from PIL import Image
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-from vis_tool import *
 from sklearn.decomposition import PCA
+import numpy as np
+import cv2
+import torch
 
 xrange = range
 
