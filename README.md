@@ -5,6 +5,16 @@
 </p>
 <br>
 
+## How to run server.py
+
+First off, copy `server.cfg` file to `serer.local.cfg` to add local settings.
+Change the path to dataset wherever your DHG-14/28 is stored.
+
+Now, in `notebooks/`, run the `database.ipynb` and `pcd_gif.ipynb` notebooks
+by changing the top path to wherever your dataset is stored.
+
+Once the notebooks are done processing, you can now run `server.py`.
+
 ## Models
 
 ### DD-net
