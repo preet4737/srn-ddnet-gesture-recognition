@@ -1,9 +1,11 @@
 from flask import request, jsonify, Flask
 from flask_restful import abort, Resource, Api 
-from srn import config, srn
 import pickle
 import configparser
 
+from srn import config, HandPose
+from ddnet.sampling import sampling_frame
+from ddnet import Predictor
 
 #################
 # Configuration #
@@ -47,9 +49,8 @@ def get_pcds( g: str, f: str, s: str, e: str ) -> list:
 ####################
 # Machine Learning #
 
-pose_predictor = srn.handpose
-
-#
+pose_predictor = HandPose(config)
+gesture_recognizer = Predictor()
 
 class Pipeline(Resource):
     def get(self):
@@ -63,7 +64,9 @@ class Pipeline(Resource):
         """
         data = request.get_json(force=True)
         poses = pose_predictor.run(data["data_dir"])
-        # print(poses[0][0])
+        model_input = sampling_frame(poses)
+        label = gesture_recognizer.predict(model_input) # Add new model
+        print(label)
         return {"message": "Success"}
 
 api.add_resource(Pipeline, "/")

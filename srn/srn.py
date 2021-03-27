@@ -62,8 +62,6 @@ class HandPose(object):
         return poses
 
 
-handpose = HandPose(config)
-
 if __name__ == '__main__':
     predictor = HandPose(config)
     poses = predictor.run('./data/essai_1')
