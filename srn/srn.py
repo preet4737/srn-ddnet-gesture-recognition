@@ -34,7 +34,8 @@ class HandPose(object):
         self.G = multi_stage(config)
 
     def run(self, data_dir):
-        poses = list()
+        poses_xyz = list()
+        poses_uvd = list()
         self.testData = dhg.realtime_loader(data_dir, (615.866, 615.866, 316.584, 228.38),
                                         cube_size=self.cube_size) 
 
@@ -51,15 +52,23 @@ class HandPose(object):
                 for index in range(0, len(outputs), 3):
                     output = outputs[index][0].view(1, -1, 3)
                     joints_xyz = self.testData.uvd_nl2xyznl_tensor(output, M, cube, center)
-
+                    
+#                     center[0][0] *= -1
+#                     center[0][0] += 320
+#                     center[0][1] += 240
+                    
+#                     cube[0][0] *= -1
+                    
                     hands172dhg = [0, 1, 6, 7, 8, 2, 9, 10, 11, 3, 12, 13, 14, 4, 15, 16, 17, 5, 18, 19, 20]
-                    center[0][0] = center[0][0] * -1 + 320
-                    center[0][1] += 240
-                    cube[0][0] *= -1
                     joints_xyz = \
-                    (joints_xyz * cube.view(1, 1, 3) / 2 + center.view(1, 1, 3)).cpu().numpy()[0]
-                    poses.append(joints_xyz)
-        return poses
+                    (joints_xyz * cube.view(1, 1, 3) / 2 + center.view(1, 1, 3))
+            
+                    poses_uvd.append(self.testData.joints3DToImg(joints_xyz).cpu().numpy()[0])
+                    joints_xyz = joints_xyz.cpu().numpy()[0]
+                    poses_xyz.append(joints_xyz)
+                    joints_uvd = output
+
+        return np.array(poses_xyz), np.array(poses_uvd)
 
 
 if __name__ == '__main__':

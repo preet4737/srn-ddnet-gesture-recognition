@@ -570,6 +570,8 @@ class loader(Dataset):
         return joint
 
     def jointsImgTo3D(self, joint_uvd):
+        # u, v to Xc, Yc
+        # Zc = d
         joint_xyz = torch.zeros_like(joint_uvd)
         joint_xyz[:, :, 0] = (joint_uvd[:, :, 0]-self.paras[2])*joint_uvd[:, :, 2]/self.paras[0]
         joint_xyz[:, :, 1] = self.flip * (joint_uvd[:, :, 1]-self.paras[3])*joint_uvd[:, :, 2]/self.paras[1]
@@ -592,12 +594,14 @@ class loader(Dataset):
         center_t = center.to(device).view(batch_size, 1, 3).repeat(1, joint_num, 1)
         M_t = M.to(device).view(batch_size, 1, 3, 3).repeat(1, joint_num, 1, 1)
         M_inverse = torch.inverse(M_t)
+        
         joint_img[:, :, 0:2] = (joint_uvd[:, :, 0:2] + 1) * (self.img_size/2)
         joint_img[:, :, 2] = (joint_uvd[:, :, 2]) * (cube_size_t[:, :, 2] / 2.0) + center_t[:, :, 2]
         joint_uvd = self.get_trans_points(joint_img, M_inverse)
         joint_xyz = self.jointsImgTo3D(joint_uvd)
         joint_xyz = (joint_xyz - center_t) / (cube_size_t / 2.0)
         return joint_xyz
+    
 
     def xyz_nl2uvdnl_tensor(self, joint_xyz, M, cube_size, center):
         device = joint_xyz.device

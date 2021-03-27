@@ -1,6 +1,7 @@
+import pathlib
 
 class Config(object):
-    model_dir = '/media/dexter/7786037C0F8CEE68/BE_Project/gesture-backend/srn/checkpoint/offset_000_240.pth'
+    model_dir = '/Users/vikrant/beproj/backend/srn/checkpoint/offset_000_240.pth'
     gpu_id = 0
     train_dataset = 'hand17'
 
