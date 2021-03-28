@@ -241,7 +241,7 @@ class loader(Dataset):
         self.pca = PCA(n_components=3)
         self.sample_num = 1024
 
-    # joint position from image to world
+    # joint position from image to camera
     def jointImgTo3D(self, uvd):
         fx, fy, fu, fv = self. paras
         ret = np.zeros_like(uvd, np.float32)

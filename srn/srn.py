@@ -8,7 +8,6 @@ from .dataLoader import dhg
 from .generateFeature import GFM
 from .config import config
 
-
 class HandPose(object):
     def __init__(self, config):
         self.model_dir = config.model_dir
@@ -36,7 +35,9 @@ class HandPose(object):
     def run(self, data_dir):
         poses_xyz = list()
         poses_uvd = list()
-        self.testData = dhg.realtime_loader(data_dir, (615.866, 615.866, 316.584, 228.38),
+#         self.testData = dhg.realtime_loader(data_dir, (615.866, 615.866, 316.584, 228.38),
+#                                         cube_size=self.cube_size) 
+        self.testData = dhg.realtime_loader(data_dir, (440.478, 461.056, 316.584, 228.38),
                                         cube_size=self.cube_size) 
 
         self.testLoader = DataLoader(self.testData, batch_size=1, shuffle=False, num_workers=1)
@@ -63,13 +64,17 @@ class HandPose(object):
                     joints_xyz = \
                     (joints_xyz * cube.view(1, 1, 3) / 2 + center.view(1, 1, 3))
             
-                    poses_uvd.append(self.testData.joints3DToImg(joints_xyz).cpu().numpy()[0])
-                    joints_xyz = joints_xyz.cpu().numpy()[0]
-                    poses_xyz.append(joints_xyz)
-                    joints_uvd = output
+                    joints_xyz_np = joints_xyz.cpu().numpy()[0][hands172dhg, :]
+                    poses_xyz.append(joints_xyz_np)
+                
+                    # image coordinates
+                    joints_uvd = self.testData.joints3DToImg(joints_xyz).cpu().numpy()[0][hands172dhg, :]
+                    poses_uvd.append(joints_uvd)
 
+        # world, img
         return np.array(poses_xyz), np.array(poses_uvd)
-
+    
+handpose = HandPose(config)
 
 if __name__ == '__main__':
     predictor = HandPose(config)
