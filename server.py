@@ -65,9 +65,8 @@ class Pipeline(Resource):
         data = request.get_json(force=True)
         poses = pose_predictor.run(data["data_dir"])
         model_input = sampling_frame(poses)
-        label = gesture_recognizer.predict(model_input) # Add new model
-        print(label)
-        return {"message": "Success"}
+        label = gesture_recognizer.predict(model_input)
+        return {"message": label}
 
 api.add_resource(Pipeline, "/")
 
