@@ -1,12 +1,15 @@
 import os
 import argparse
 import torch.nn.parallel
+import cv2
+import torch
 from torch.utils.data import DataLoader
 
 from .module_2d import *
 from .dataLoader import dhg
 from .generateFeature import GFM
 from .config import config
+from .vis_tool import draw_pose
 
 class HandPose(object):
     def __init__(self, config):
@@ -32,9 +35,13 @@ class HandPose(object):
 
         self.G = multi_stage(config)
 
+        self.draw_dir = config.draw_dir
+
     def run(self, data_dir):
         poses_xyz = list()
         poses_uvd = list()
+        poses_world = list()
+        paras = (440.44232, 461.0357, -0.00015258789, 3.0517578e-05)
 #         self.testData = dhg.realtime_loader(data_dir, (615.866, 615.866, 316.584, 228.38),
 #                                         cube_size=self.cube_size) 
 #         self.testData = dhg.realtime_loader(data_dir, (440.478, 461.056, 316.584, 228.38),
@@ -72,9 +79,24 @@ class HandPose(object):
                     # image coordinates
                     joints_uvd = self.testData.joints3DToImg(joints_xyz).cpu().numpy()[0][hands172dhg, :]
                     poses_uvd.append(joints_uvd)
+                    
+                    # world coordinates
+                    joints_world = joints_uvd.copy()
+                    joints_world[:, 2] = joints_world[:, 2] * 0.00093 
+                    joints_world[:, 0] = ((640 - joints_world[:, 0]) - paras[2]) * joints_world[:, 2] / paras[0]
+                    joints_world[:, 1] = ((joints_world[:, 1]) - paras[3]) * joints_world[:, 2] / -paras[1]
+                    poses_world.append(joints_world)
 
-        # world, img
-        return np.array(poses_xyz), np.array(poses_uvd)
+                    # Pose Image generation
+                    img_draw = (img.cpu().numpy() + 1) / 2 * 255
+                    joints_draw = (output.detach().cpu().numpy() + 1) * (self.input_size / 2)
+                    img_dir =  self.draw_dir + str(batch_idx) +  '_depth.png'
+                    img_show = draw_pose("hands17", cv2.cvtColor(img_draw[0, 0], cv2.COLOR_GRAY2RGB),
+                                         joints_draw[0])
+                    cv2.imwrite(img_dir, img_show)
+
+        # return world coordinates
+        return np.array(poses_world)
     
 handpose = HandPose(config)
 

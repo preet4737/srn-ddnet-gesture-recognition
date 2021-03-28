@@ -1,7 +1,8 @@
 import pathlib
 
 class Config(object):
-    model_dir = '/Users/vikrant/beproj/backend/srn/checkpoint/offset_000_240.pth'
+    model_dir = './srn/checkpoint/offset_000_240.pth'
+    draw_dir = './srn/results/'
     gpu_id = 0
     train_dataset = 'hand17'
 
