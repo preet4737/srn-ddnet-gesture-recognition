@@ -37,7 +37,9 @@ class HandPose(object):
         poses_uvd = list()
 #         self.testData = dhg.realtime_loader(data_dir, (615.866, 615.866, 316.584, 228.38),
 #                                         cube_size=self.cube_size) 
-        self.testData = dhg.realtime_loader(data_dir, (440.478, 461.056, 316.584, 228.38),
+#         self.testData = dhg.realtime_loader(data_dir, (440.478, 461.056, 316.584, 228.38),
+#                                         cube_size=self.cube_size) 
+        self.testData = dhg.realtime_loader(data_dir, (440.44232, 461.0357, -0.00015258789, 3.0517578e-05),
                                         cube_size=self.cube_size) 
 
         self.testLoader = DataLoader(self.testData, batch_size=1, shuffle=False, num_workers=1)
