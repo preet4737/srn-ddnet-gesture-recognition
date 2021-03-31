@@ -142,4 +142,5 @@ cython_debug/
 dataset/
 server.local.cfg
 index.pkl
+index.json
 test.py
