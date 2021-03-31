@@ -8,7 +8,7 @@ from .labels import _LABELS_14, _LABELS_28
 class Predictor:
     def __init__(self):
         global _LABELS_28, _LABELS_14
-        self.labels = _LABELS_28
+        self.labels = _LABELS_14
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.model = keras.models.load_model(dir_path + "/model")
