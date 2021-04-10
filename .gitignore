@@ -143,3 +143,4 @@ dataset/
 server.local.cfg
 index.pkl
 test_pipeline.ipynb
+index.json
