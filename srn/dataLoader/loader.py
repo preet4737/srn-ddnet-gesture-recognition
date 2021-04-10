@@ -626,6 +626,12 @@ class loader(Dataset):
         joints_trans[:, :, 2] = joints[:, :, 2]
         return joints_trans
 
+    def transform_to_DHG_world(self, joints_image: np.ndarray, paras: tuple):
+        joints_world = joints_image.copy()
+        joints_world[:, 2] = joints_world[:, 2] * 0.00093 
+        joints_world[:, 0] = ((640 - joints_world[:, 0]) - paras[2]) * joints_world[:, 2] / paras[0]
+        joints_world[:, 1] = ((joints_world[:, 1]) - paras[3]) * joints_world[:, 2] / -paras[1]
+        return joints_world
 
 class realtime_loader(loader):
     def __init__(self, data_path, paras, frame_len, img_size=128, cube_size=[300, 300, 300]):

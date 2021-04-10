@@ -142,4 +142,4 @@ cython_debug/
 dataset/
 server.local.cfg
 index.pkl
-test.py
+test_pipeline.ipynb

@@ -4,6 +4,9 @@ import torch.nn.parallel
 import cv2
 import torch
 from torch.utils.data import DataLoader
+import PIL
+import pathlib
+import numpy as np
 
 from .module_2d import *
 from .dataLoader import dhg
@@ -36,11 +39,24 @@ class HandPose(object):
         self.G = multi_stage(config)
 
         self.draw_dir = config.draw_dir
-        
-    def run(self, data_dir):
+
+
+    def drawpose_on_DHG(self, joints_image: np.ndarray, data_dir: str, batch_idx: int):
+        joints_draw = joints_image.copy()
+        joints_draw[:,0] = 640 - joints_draw[:,0]
+        img = cv2.imread(data_dir + f'{batch_idx}_depth.png', cv2.IMREAD_ANYDEPTH)
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+        img = (img - img.min())/(img.max() - img.min()) * 255
+        img_dir =  self.draw_dir + str(batch_idx) +  '_depth.png'
+        img = draw_pose("msra", img, joints_draw)
+        img = img.astype('uint8')
+        return img
+
+
+    def run(self, data_dir: str):
         poses_image = list() # To store image coordinates
         poses_world = list() # To store DHG's world coordinates
-        
+        nls = list()
         # paras = (615.866, 615.866, 316.584, 228.38) # Copied from realsense dataset
         paras = (440.44232, 461.0357, -0.00015258789, 3.0517578e-05) # 
     
@@ -70,22 +86,25 @@ class HandPose(object):
                     joints_image = self.testData.joints3DToImg(joints_xyz).cpu().numpy()[0][hands172dhg, :]
                     
                     # DHG's world coordinates
-                    joints_world = joints_image.copy()
-                    joints_world[:, 2] = joints_world[:, 2] * 0.00093 
-                    joints_world[:, 0] = ((640 - joints_world[:, 0]) - paras[2]) * joints_world[:, 2] / paras[0]
-                    joints_world[:, 1] = ((joints_world[:, 1]) - paras[3]) * joints_world[:, 2] / -paras[1]
-                    poses_world.append(joints_world)
+                    poses_world.append(self.testData.transform_to_DHG_world(joints_image, paras))
 
                     # Pose Image generation
-                    if False:
-                        img_draw = (img.cpu().numpy() + 1) / 2 * 255
-                        joints_draw = (output.detach().cpu().numpy() + 1) * (self.input_size / 2)
-                        img_dir =  self.draw_dir + str(batch_idx) +  '_depth.png'
-                        img_show = draw_pose("hands17", cv2.cvtColor(img_draw[0, 0], cv2.COLOR_GRAY2RGB),
-                                             joints_draw[0])
-                        cv2.imwrite(img_dir, img_show)
+                    if True:
+                        img = self.drawpose_on_DHG(joints_image, data_dir, batch_idx)
+                        nls.append(PIL.Image.fromarray(img))
 
-        # return world coordinates
+        # Generate gif                
+        gif_dir = pathlib.Path(self.draw_dir)
+        name = str(gif_dir / 'action.gif')
+        duration = 1000/30
+        nls[0].save(
+            name,
+            append_images=nls[1:],
+            save_all=True,
+            duration=duration,
+            loop=0
+        )
+        # return DHG World coordinates
         return np.array(poses_world)
     
 handpose = HandPose(config)

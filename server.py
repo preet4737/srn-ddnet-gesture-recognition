@@ -2,6 +2,7 @@ from flask import request, jsonify, Flask
 from flask_restful import abort, Resource, Api 
 import pickle
 import configparser
+import os
 
 from srn import config, HandPose
 from ddnet.sampling import sampling_frame
@@ -27,24 +28,24 @@ api = Api(app)
 #######################
 # Dataset Information #
 
-with open( C['dataset']['index_file'], 'rb' ) as f:
-    index = pickle.load( f )
+# with open( C['dataset']['index_file'], 'rb' ) as f:
+#     index = pickle.load( f )
 
-#
+# #
 
-@app.route('/info/<g>')
-def get_essais( g: str ) -> list:
-    """ Returns essai list for a gesture """
-    essais = index[g]['essais']
-    essais = jsonify(essais)
-    return essais
+# @app.route('/info/<g>')
+# def get_essais( g: str ) -> list:
+#     """ Returns essai list for a gesture """
+#     essais = index[g]['essais']
+#     essais = jsonify(essais)
+#     return essais
 
-@app.route('/info/<g>/<f>/<s>/<e>')
-def get_pcds( g: str, f: str, s: str, e: str ) -> list:
-    """ Returns PCD list for an essai """
-    pcds = index[g][f][s][e]
-    pcds = jsonify(pcds)
-    return pcds
+# @app.route('/info/<g>/<f>/<s>/<e>')
+# def get_pcds( g: str, f: str, s: str, e: str ) -> list:
+#     """ Returns PCD list for an essai """
+#     pcds = index[g][f][s][e]
+#     pcds = jsonify(pcds)
+#     return pcds
 
 ####################
 # Machine Learning #
@@ -66,7 +67,11 @@ class Pipeline(Resource):
         poses = pose_predictor.run(data["data_dir"])
         model_input = sampling_frame(poses)
         label = gesture_recognizer.predict(model_input)
-        return {"message": label}
+        gif_path = os.getcwd() + "/srn/results/action.gif"
+        return {
+            "message": label,
+            "gif_path": gif_path
+        }
 
 api.add_resource(Pipeline, "/")
 
