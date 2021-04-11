@@ -40,6 +40,9 @@ class HandPose:
 
         self.draw_dir = config.draw_dir
 
+        self.G.load_state_dict(torch.load(os.path.join(self.model_dir), map_location=lambda storage, loc: storage))
+        self.GFM_ = GFM()
+
 
     def drawpose_on_DHG(self, joints_image: np.ndarray, data_dir: str, batch_idx: int):
         joints_draw = joints_image.copy()
@@ -57,16 +60,12 @@ class HandPose:
         poses_image = list() # To store image coordinates
         poses_world = list() # To store DHG's world coordinates
         nls = list()
-        # paras = (615.866, 615.866, 316.584, 228.38) # Copied from realsense dataset
         paras = (440.44232, 461.0357, -0.00015258789, 3.0517578e-05) # 
     
         hands172dhg = [0, 1, 6, 7, 8, 2, 9, 10, 11, 3, 12, 13, 14, 4, 15, 16, 17, 5, 18, 19, 20]
 
         self.testData = dhg.realtime_loader(data_dir, paras, cube_size=self.cube_size) 
-
         self.testLoader = DataLoader(self.testData, batch_size=1, shuffle=False, num_workers=1)
-        self.G.load_state_dict(torch.load(os.path.join(self.model_dir), map_location=lambda storage, loc: storage))
-        self.GFM_ = GFM()
         self.G.eval()
 
         for batch_idx, data in enumerate(self.testLoader):
@@ -95,18 +94,21 @@ class HandPose:
 
         # Generate gif                
         gif_dir = pathlib.Path(self.draw_dir)
-        name = str(gif_dir / 'action.gif')
+        name = gif_dir / data_dir
+        name.mkdir(parents=True, exist_ok=True)
+        name = str(name / 'action.gif')
         duration = 1000/30
-        nls[0].save(
-            name,
-            append_images=nls[1:],
-            save_all=True,
-            duration=duration,
-            loop=0
-        )
+        if True:
+            nls[0].save(
+                name,
+                append_images=nls[1:],
+                save_all=True,
+                duration=duration,
+                loop=0
+            )
 
-        # return DHG World coordinates
-        return np.array(poses_world)
+        # return DHG World coordinates, path to gif
+        return np.array(poses_world), name
     
 handpose = HandPose(config)
 

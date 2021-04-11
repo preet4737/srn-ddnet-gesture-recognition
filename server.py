@@ -34,18 +34,17 @@ def run_networks():
     data = request.get_json(force=True)
     data_dir = data['data_dir']
     data_dir = '/'.join(data_dir.split('/')[-4:])
-    poses = pose_predictor.run(C['dataset']['path'] + '/' + data_dir)
+    poses, gif_path = pose_predictor.run(C['dataset']['path'] + '/' + data_dir)
     model_input = sampling_frame(poses)
     label = gesture_recognizer.predict(model_input)
-    gif_path = '/srn/results/action.gif'
     return {
         'label': label,
-        'gif': gif_path
+        'gif': '/' + gif_path
     }
 
-@app.route('/srn/results/action.gif', methods=['GET'])
-def get_gif():
-    return send_file('./srn/results/action.gif', mimetype='image/gif')
+@app.route('/srn/results/dataset/<gesture>/<finger>/<subject>/<essai>/action.gif', methods=['GET'])
+def get_gif(gesture, finger, subject, essai):
+    return send_file(f'srn/results/dataset/{gesture}/{finger}/{subject}/{essai}/action.gif', mimetype='image/gif')
 
 #######
 # Run #
