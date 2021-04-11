@@ -14,7 +14,7 @@ from .generateFeature import GFM
 from .config import config
 from .vis_tool import draw_pose
 
-class HandPose(object):
+class HandPose:
     def __init__(self, config):
         self.model_dir = config.model_dir
         self.train_dataset = config.train_dataset
@@ -44,7 +44,7 @@ class HandPose(object):
     def drawpose_on_DHG(self, joints_image: np.ndarray, data_dir: str, batch_idx: int):
         joints_draw = joints_image.copy()
         joints_draw[:,0] = 640 - joints_draw[:,0]
-        img = cv2.imread(data_dir + f'{batch_idx}_depth.png', cv2.IMREAD_ANYDEPTH)
+        img = cv2.imread(data_dir + '/' + f'{batch_idx}_depth.png', cv2.IMREAD_ANYDEPTH)
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
         img = (img - img.min())/(img.max() - img.min()) * 255
         img_dir =  self.draw_dir + str(batch_idx) +  '_depth.png'
@@ -104,6 +104,7 @@ class HandPose(object):
             duration=duration,
             loop=0
         )
+
         # return DHG World coordinates
         return np.array(poses_world)
     
@@ -112,5 +113,5 @@ handpose = HandPose(config)
 if __name__ == '__main__':
     predictor = HandPose(config)
     poses = predictor.run('./data/essai_1')
-
     print(poses)
+
