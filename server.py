@@ -42,9 +42,9 @@ def run_networks():
         'gif': '/' + gif_path
     }
 
-@app.route('/srn/results/dataset/<gesture>/<finger>/<subject>/<essai>/action.gif', methods=['GET'])
+@app.route('/srn/results/<gesture>/<finger>/<subject>/<essai>/action.gif', methods=['GET'])
 def get_gif(gesture, finger, subject, essai):
-    return send_file(f'srn/results/dataset/{gesture}/{finger}/{subject}/{essai}/action.gif', mimetype='image/gif')
+    return send_file(f'srn/results/{gesture}/{finger}/{subject}/{essai}/action.gif', mimetype='image/gif')
 
 #######
 # Run #

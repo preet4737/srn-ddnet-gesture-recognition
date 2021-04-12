@@ -93,10 +93,13 @@ class HandPose:
                         nls.append(PIL.Image.fromarray(img))
 
         # Generate gif                
+        print("Ran on ", data_dir)
         gif_dir = pathlib.Path(self.draw_dir)
-        name = gif_dir / data_dir
+        rel_data_dir = '/'.join(data_dir.split('/')[-4:])
+        name = gif_dir / rel_data_dir
         name.mkdir(parents=True, exist_ok=True)
         name = str(name / 'action.gif')
+        print("Save to ", name)
         duration = 1000/30
         if True:
             nls[0].save(
