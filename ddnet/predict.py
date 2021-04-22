@@ -4,6 +4,7 @@ import numpy as np
 import keras
 from .labels import _LABELS_14, _LABELS_28
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 class Predictor:
     def __init__(self):
